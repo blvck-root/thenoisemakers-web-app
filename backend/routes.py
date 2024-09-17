@@ -2,10 +2,8 @@ import json
 
 from flask import jsonify, request
 from bson import ObjectId
-from app import app
-from models import User, RegistrationForm
-
-# ... import other necessary modules like Flask-Security
+from app import app, crsf
+from models.user import User, RegistrationForm, UpdateForm
 
 users = User.collection
 
@@ -23,6 +21,7 @@ def hello_noisemakers():
     return "<p>Hello, Noisemakers!</p>"
 
 @app.route('/users', methods=['POST'])
+@crsf.exempt
 def create_user():
     user_data = request.get_json()
     form = RegistrationForm(data=user_data)
@@ -36,6 +35,7 @@ def create_user():
         return jsonify({'errrors': errors}), 400
 
 @app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
+@crsf.exempt
 def user_operations(user_id):
     user_id = ObjectId(user_id)
 
