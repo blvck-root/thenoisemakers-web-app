@@ -1,12 +1,28 @@
 import bcrypt
+import email_validator
 from db import Connection
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField, PasswordField, BooleanField, URLField, ValidationError
-from wtforms.validators import DataRequired, Length, EqualTo, Email
+from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 
 db = Connection()
+def unique(collection, property):
+    """Decorator that checks if a form field is unique in the specified collection.
+
+    Args:
+        collection (MotorCollection): The MongoDB collection to check for uniqueness.
+        property (str): The property name (e.g., "username", "email") to check for uniqueness.
+
+    Returns:
+        callable: A validation function for the form field.
+    """
+    def validate(form, field):
+        if collection.find_one({property: field.data}):
+            raise ValidationError(f"User with that {property} already exists")
+
+    return validate
 
 class User:
     collection = db.get_collection('users')
@@ -43,29 +59,10 @@ class User:
 
 class RegistrationForm(FlaskForm):
     full_name = StringField('Full Name', validators=[DataRequired()])
-    username = StringField('Username', validators=[Length(min=4, max=25)])
-    email = EmailField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
-    confirm = PasswordField('Repeat Password')
-    accept_tos = BooleanField('I accept the TOS', validators=[DataRequired()])
+    username = StringField('Username', validators=[DataRequired(), unique(User.collection, 'username'), Length(min=4, max=25)])
+    email = EmailField('Email', validators=[DataRequired(), Email(message="Invalid email address"), unique(User.collection, 'email')])
+    password = PasswordField('New Password', validators=[DataRequired()])
+    # password = PasswordField('New Password', validators=[DataRequired(), EqualTo('confirm', message='Passwords must match')])
+    # confirm = PasswordField('Repeat Password')
+    # accept_tos = BooleanField('I accept the TOS', validators=[DataRequired()])
     bio = StringField('Bio', validators=[Length(max=150)])
-
-class Post:
-    collection = db.get_collection('posts')
-
-    def __init__(self, user_id, post_type, cover_img="", thumbnail="",  content={}, caption="", link="", link_text=""):
-        self.user_id = user_id
-        self.post_type = post_type
-        self.cover_img = cover_img
-        self.thumbnail = thumbnail
-        self.content = content
-        self.caption = caption
-        self.link = link
-        self.link_text = link_text
-
-    def save(self):
-        self.collection.insert_one(self.__dict__)
-
-    @classmethod
-    def find_by_id(cls, post_id):
-        return cls.collection.find_one({'_id': post_id})
