@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField, PasswordField, BooleanField, URLField, ValidationError
 from wtforms.validators import DataRequired, Email, EqualTo, Length
 
+
 class Post:
     collection = db.get_collection('posts')
 

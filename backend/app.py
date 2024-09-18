@@ -6,7 +6,8 @@ from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
 app.config.from_object('config')
-crsf = CSRFProtect(app)
+app.secret_key = "makesomenoise"
+csrf = CSRFProtect(app)
 
 from routes import *
 
