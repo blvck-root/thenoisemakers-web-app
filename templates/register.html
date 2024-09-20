@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+<link rel="stylesheet" href='{{url_for("static", filename="css/register.css")}}'>
+{% endblock css %}
+
+
+{% block js %}
+<script src='{{url_for("static", filename="js/register.js")}}' defer></script>
+{% endblock js %}
+
+
+{% block body_content %}
+<main class="main-container">
+	<h1 class="main-header">Register an Account with Us</h1>
+	<p class="main-subtitle">Register here with us!</p>
+
+	<form action="/register" method="post" enctype="multipart/form-data">
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+		<input type="text" name="full_name" id="full_name" required placeholder="Full Name"/>
+		<input type="text" name="username" id="username" required placeholder="Username"/>
+		<input type="email" name="email" id="email" required placeholder="Email Address"/>
+		<input type="password" name="password" id="password" required placeholder="Password" />
+		<input type="file" name="picture" id="picture" accept=".png .jpg .jpeg">
+		<button>Register Now</button>
+	</form>
+</main>
+{% endblock body_content %}

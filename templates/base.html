@@ -1,0 +1,39 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask App</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/base.css')}}">
+    <script src="{{url_for('static', filename='js/base.js')}}" defer></script>
+    {% block css %}{% endblock css %}
+    {% block js %}{% endblock js %}
+</head>
+<body>
+    <header class="header-container">
+        <a href="/"><h2 class="header-title">The Noisemakers</h2></a>
+        <nav class="navigation-container">
+            <ul>
+                <a href="/login"><li class="link">Sign In</li></a>
+                {% if current_user.is_authenticated %}
+                <a href="/register"><li class="link">Sign Up</li></a>
+                <a href="/profile"><li class="link">Profile</li></a>
+                <a href="/logout"><li class="link">Sign Out</li></a>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <!--Here other html files that extend this base template will come here 
+    provided the names match, as with this example body_content-->
+    {% block body_content %}{% endblock body_content %}
+
+    <!--You can create multiple block contents that will be rendered when the 
+    template that extends this template with matching block name will 
+    rendered in the block place-->
+
+    <footer class="footer-container">
+        <p class="footer-details">&copy; 2024 The Noisemakers</p>
+    </footer>
+</body>
+</html>

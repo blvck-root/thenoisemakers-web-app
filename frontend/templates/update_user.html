@@ -1,0 +1,10 @@
+{% from "_form_helpers.html" import render_field %}
+<form method="post", action="{{ url_for('update_user', user_id=user_id) }}">
+	<input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+	<dl>
+		{{ render_field(form.full_name) }}
+		{{ render_field(form.username) }}
+		{{ render_field(form.bio) }}
+	</dl>
+	<p><input type="submit" value="Save"></p>
+</form>
