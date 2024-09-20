@@ -1,7 +1,9 @@
 import json
+import base64
 
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 from bson import ObjectId
+
 from app import app, csrf
 from models.user import User, RegistrationForm, UpdateUserForm
 
@@ -12,54 +14,58 @@ class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
             return str(o)
-        return json.JSONEncoder.default(self, o)
+        if isinstance(o, bytes):
+            return base64.b64encode(o).decode('utf-8')
+        return super().default(o)
 
 
 # implement logic to display home page
 @app.route('/')
 def hello_noisemakers():
-    # render home template
-    return "<p>Hello, Noisemakers!</p>"
+    return render_template("index.html")
 
 
-@app.route('/users', methods=['POST'])
-@csrf.exempt
-def create_user():
-    user_data = request.get_json()
-    form = RegistrationForm(data=user_data)
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
 
-    if form.validate():
-        new_user = User(**user_data)
+    if request.method == 'POST' and form.validate():
+        data = {
+            'full_name': request.form.get('full_name'),
+            'username': request.form.get('username'),
+            'email': request.form.get('email'),
+            'password': request.form.get('password'),
+        }
+        new_user = User(**data)
         new_user.save()
         return JSONEncoder().encode(
             {'message': "User created successfully"}
             ), 200
     else:
-        errors = form.errors
-        return jsonify({'errors': errors}), 400
+        return render_template('register.html', form=form)
 
 
-@app.route('/users/<user_id>', methods=['PUT'])
-@csrf.exempt
+@app.route('/users/<user_id>/edit', methods=['GET', 'POST'])
 def update_user(user_id):
     user = User.find_by_id(user_id)
-    user_data = request.get_json()
     form = UpdateUserForm()
 
-    if form.validate():
-        try:
-            user.update(**user_data)
-            return JSONEncoder.encode(
-                {'message': "User updated successfully"}
-                ), 200
-        except ValueError as e:
-            return JSONEncoder.encode({'error': e}), 400
-    else:
-        errors = form.errors
-        return jsonify({'errors': errors}), 400
+    if request.method == 'PUT' and form.validate():
+        data = {
+            'full_name': request.form.get('full_name'),
+            'username': request.form.get('username'),
+            'bio': request.form.get('bio')
+        }
 
-@app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
-@csrf.exempt
+        user.update(**data)
+        return JSONEncoder.encode(
+            {'message': "User updated successfully"}
+            ), 200
+    else:
+        return render_template('update_user.html', user_id=user_id, form=form)
+
+
+@app.route('/users/<user_id>', methods=['GET', 'DELETE'])
 def user_operations(user_id):
     user_id = ObjectId(user_id)
 
@@ -75,12 +81,6 @@ def user_operations(user_id):
             ), 200
     else:
         return JSONEncoder().encode({'error': "Method not allowed"}), 405
-    """
-        elif request.method == "PUT":
-        user_data = request.get_json()
-        users.find_one_and_update({"_id": user_id}, {"$set": user_data})
-        return JSONEncoder().encode({'message': "User updated successfully"})
-    """
 
 
 @app.route('/users', methods=['GET'])

@@ -45,6 +45,18 @@ class User:
         self.profile_pic = profile_pic
         self.banner_img = banner_img
 
+    @staticmethod
+    def is_authenticated():
+        return True
+    
+    @staticmethod
+    def is_active():
+        return True
+    
+    @staticmethod
+    def is_anonymous():
+        return False
+
     def save(self):
         # hash password
         self.password = bcrypt.hashpw(
@@ -60,7 +72,10 @@ class User:
             if value:
                 setattr(self, field, value)
 
-        self.collection.update_one(self.__dict__)
+        self.collection.find_one_and_update(
+            {'_id': self._id}, 
+            {'$set': self.__dict__}
+        )
 
     @classmethod
     def find_by_username(cls, username):
@@ -119,12 +134,6 @@ class UpdateUserForm(FlaskForm):
             Optional(strip_whitespace=True),
             unique(User.collection, 'username'),
             Length(min=4, max=80)])
-    email = EmailField(
-        'Email',
-        validators=[
-            Optional(),
-            Email(message="Invalid email address"),
-            unique(User.collection, 'email')])
     bio = StringField(
         'Bio',
         validators=[
