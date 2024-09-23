@@ -19,7 +19,7 @@ def register():
 
         # Save the uploaded file to a directory on your server
         # Preferably outside the application root
-        uploaded_file.save(f"/static/images/{uploaded_file.filename}")
+        uploaded_file.save(f"static/images/{uploaded_file.filename}")
 
         # Implement database logic to register user
         data = {
@@ -27,12 +27,12 @@ def register():
             "username": username,
             "email": email,
             "password": generate_password_hash(password),
-            "profile_pic": f"/static/images/{uploaded_file.filename}"
+            "profile_pic": f"static/images/{uploaded_file.filename}"
         }
 
         try:
-            check_email = User.find_one({"email": request.form.get("email")})
-            check_username = User.find_one({"username": request.form.get("username")})
+            check_email = User.find_by_email(email)
+            check_username = User.find_by_username(username)
 
             if check_email or check_username:
                 flash("Credentials already in use!", "error")
@@ -42,7 +42,7 @@ def register():
             new_user.save()
         except Exception as e:
             print(e)
-            flash("Error ocfindred during registration. Try again!", "error")
+            flash("Error occurred during registration. Try again!", "error")
             return redirect("/register")
 
         return render_template("login.html")
@@ -67,7 +67,7 @@ def login():
         user_password = request.form.get("password")
 
         # Retrieve user from the database with username
-        find_user = User.find_one({"username": username})
+        find_user = User.find_by_username(username)
 
         if find_user == None:
             flash("Invalid login credentials!", "error")
@@ -87,6 +87,7 @@ def login():
             find_user.get("username"),
             find_user.get("email"),
             find_user.get("password"),
+            find_user.get("_id"),
             find_user.get("bio"),
             find_user.get("links"),
             find_user.get("profile_pic"),

@@ -1,3 +1,4 @@
+"""
 import json
 import base64
 
@@ -89,3 +90,4 @@ def get_users():
     users = User.find_all_users()
     print(f"Users: {users}")
     return JSONEncoder().encode(users)
+"""

@@ -1,4 +1,3 @@
-import bcrypt
 import email_validator
 from db import Connection
 
@@ -34,8 +33,10 @@ def unique(collection, property):
 class User:
     collection = db.get_collection('users')
 
-    def __init__(self, full_name, username, email, password,
+    def __init__(self, full_name, username, email, password, id="",
                  bio="", links={}, profile_pic="", banner_img=""):
+        if id:
+            self._id = str(id)
         self.full_name = full_name
         self.username = username
         self.email = email
@@ -59,11 +60,11 @@ class User:
 
     def save(self):
         # hash password
-        self.password = bcrypt.hashpw(
-            self.password.encode('utf-8'),
-            bcrypt.gensalt())
         self.collection.insert_one(self.__dict__)
         return "User created successfully"
+
+    def get_id(self):
+        return self._id
 
     def update(self, **kwargs):
         """Update fields with provided data, keep previous values if empty.
@@ -81,6 +82,7 @@ class User:
     def find_by_username(cls, username):
         return cls.collection.find_one({'username': username})
 
+    @classmethod
     def find_by_email(cls, email):
         return cls.collection.find_one({'email': email})
 

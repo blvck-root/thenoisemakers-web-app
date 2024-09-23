@@ -8,7 +8,7 @@ from flask_login import LoginManager
 from models.user import User
 from flask_wtf import CSRFProtect
 
-app = Flask(__name__, template_folder="../templates")
+app = Flask(__name__, template_folder="../templates", static_folder="../static")
 app.config.from_object('config')
 app.secret_key = "makesomenoise"
 csrf = CSRFProtect(app)
@@ -33,6 +33,7 @@ def load_user(id):
         cur_user.get("username"),
         cur_user.get("email"),
         cur_user.get("password"),
+        cur_user.get("_id"),
         cur_user.get("bio"),
         cur_user.get("links"),
         cur_user.get("profile_pic"),
