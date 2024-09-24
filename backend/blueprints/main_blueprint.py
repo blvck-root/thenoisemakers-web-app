@@ -1,4 +1,5 @@
-from flask import Blueprint, request, render_template, send_from_directory
+from flask import Blueprint, request, render_template
+from models.user import User
 
 main_views = Blueprint("main", __name__)
 
@@ -8,4 +9,5 @@ def index():
 
 @main_views.get("/profile/<string:username>", strict_slashes=False)
 def profile(username):
-    return render_template("profile.html")
+    user = User.find_by_username(username)
+    return render_template("profile.html", user=user)

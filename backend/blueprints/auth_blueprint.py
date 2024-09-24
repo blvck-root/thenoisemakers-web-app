@@ -98,7 +98,7 @@ def login():
         login_user(log_user)
 
         # Then return the user to the index page after sucess
-        return redirect("/")
+        return redirect(f"/profile/{username}")
 
         # Make sure to do proper error handling with try/except
         # I don't want to make the code too bulky
