@@ -71,7 +71,7 @@ def login():
 
         if find_user == None:
             flash("Invalid login credentials!", "error")
-            return redirect("/login")
+            return redirect("/register")
         
         # compare the user password with the password returned from db
         is_valid_password = check_password_hash(find_user.get("password"), user_password)
