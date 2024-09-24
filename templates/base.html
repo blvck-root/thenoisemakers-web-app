@@ -15,11 +15,12 @@
         <a href="/"><h2 class="header-title">The Noisemakers</h2></a>
         <nav class="navigation-container">
             <ul>
-                <a href="/login"><li class="link">Sign In</li></a>
                 {% if current_user.is_authenticated %}
-                <a href="/register"><li class="link">Sign Up</li></a>
-                <a href="/profile"><li class="link">Profile</li></a>
+                <a href="{{url_for('main.profile', username=current_user.username)}}"><li class="link">Profile</li></a>
                 <a href="/logout"><li class="link">Sign Out</li></a>
+                {% else %}
+                <a href="/login"><li class="link">Sign In</li></a>
+                <a href="/register"><li class="link">Sign Up</li></a>
                 {% endif %}
             </ul>
         </nav>

@@ -2,12 +2,15 @@
 
 {% block body_content %}
 <main class="main-container">
-	<h1 class="main-header">Hello, Noisemaker</h1>
-	<p class="main-subtitle">Dare to be heard. Make some noise</p>
-
-	<section>
-		<h1>This will be the protected route in the application.</h1>
-		<p>Only Logged In Users can access this route1</p>
-	</section>
+    <section class="profile-section">
+        <div class="profile-header">
+            <img class="profile-pic" src="../{{ user.profile_pic }}" alt="{{ user.full_name }}">
+            <h2 class="profile-username">{{ user.full_name }}</h2>
+			<p> {{ user.username }} </p>
+        </div>
+        <div class="profile-info">
+            <p><strong>Bio:</strong> {{ user.bio }}</p>
+            </div>
+    </section>
 </main>
 {% endblock body_content %}

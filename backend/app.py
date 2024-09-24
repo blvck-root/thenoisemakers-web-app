@@ -1,6 +1,7 @@
 """Setting up my flask app."""
 
 from flask import Flask
+from bson import ObjectId
 from blueprints.main_blueprint import main_views
 from blueprints.auth_blueprint import auth_views
 
@@ -22,22 +23,24 @@ login.login_view = "/login"
 @login.user_loader
 def load_user(id):
     """Confirm user exists then use, else return None"""
-    cur_user = User.find_by_id(id)
+    print(f"ID: {id}")
+    current_user = User.find_by_id(ObjectId(id))
 
-    if cur_user is None:
+    if current_user is None:
+        print("No user!!!")
         return None
     
     # create user instance from retrieved user
     return User(
-        cur_user.get("full_name"),
-        cur_user.get("username"),
-        cur_user.get("email"),
-        cur_user.get("password"),
-        cur_user.get("_id"),
-        cur_user.get("bio"),
-        cur_user.get("links"),
-        cur_user.get("profile_pic"),
-        cur_user.get("banner_img")
+        current_user.get("full_name"),
+        current_user.get("username"),
+        current_user.get("email"),
+        current_user.get("password"),
+        current_user.get("_id"),
+        current_user.get("bio"),
+        current_user.get("links"),
+        current_user.get("profile_pic"),
+        current_user.get("banner_img")
     )
 
 if __name__ == '__main__':
